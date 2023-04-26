@@ -1,8 +1,8 @@
 <?php
-class m_mahasiswa extends CI_Model
+class m_buku extends CI_Model
 {
-    private $table = "mahasiswa";
-    private $primary = "nim";
+    private $table = "buku";
+    private $primary = "kd_buku";
     function tampilData()
     {
         if (empty($order_column) || empty($order_type))
@@ -10,13 +10,13 @@ class m_mahasiswa extends CI_Model
         else
             $this->db->order_by();
         return $this->db->get($this->table);
-        //SELECT * FROM mahasiswa ORDER BY nim asc
+        //SELECT * FROM buku ORDER BY kd_buku asc
     }
-    function hapus($nim)
+    function hapus($kd_buku)
     {
-        $this->db->where($this->primary, $nim);
+        $this->db->where($this->primary, $kd_buku);
         $this->db->delete($this->table);
-        //DELETE FROM mahasiswa WHERE nim = $nim;
+        //DELETE FROM buku WHERE kd_buku = $kd_buku;
     }
     function input_data($data, $table)
     {

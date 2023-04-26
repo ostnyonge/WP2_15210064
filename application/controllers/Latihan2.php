@@ -23,25 +23,17 @@ class Latihan2 extends CI_Controller
             [
                 'required' => '* Kode Matakuliah Harus diisi',
                 'min_lenght' => '* Kode terlalu pendek'
-                ]
-            );
-            $this->form_validation->set_rules(
-                'nama',
-                'Nama Matakuliah',
-                'required',
-                [
-                    'required' => '* Nama Matakuliah Harus diisi'
-                    ]
-                );
-                if ($this->form_validation->run() != true) {
-                    $this->load->helper('url');
-                    $this->load->view('Input_matakuliah');
-                } else {
-                    if ($sksMataKuliah == 1) {
-                        $sksUnggulan = "SKS Reguler";
-                        $BobotNilai = "< 60";
-                        $Status = "Wajib Remedial";
-                    } else if ($sksMataKuliah == 2) {
+            ]
+        );
+        if ($this->form_validation->run() != true) {
+            $this->load->helper('url');
+            $this->load->view('Input_matakuliah');
+        } else {
+            if ($sksMataKuliah == 1) {
+                $sksUnggulan = "SKS Reguler";
+                $BobotNilai = "< 60";
+                $Status = "Wajib Remedial";
+            } else if ($sksMataKuliah == 2) {
                 $sksUnggulan = "SKS Reguler";
                 $BobotNilai = "60 sd 74";
                 $Status = "Tidak Remedial";
@@ -64,7 +56,7 @@ class Latihan2 extends CI_Controller
                 'status' => $Status
             ];
             //kirim ke view
-            
+
             $this->load->helper('url');
             $this->load->view('Output_matakuliah.html', $data);
         }
