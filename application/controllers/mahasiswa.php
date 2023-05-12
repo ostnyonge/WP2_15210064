@@ -4,150 +4,69 @@ class mahasiswa extends CI_Controller
     function __construct()
     {
         parent::__construct();
+        $this->load->library(array('template', 'pagination', 'form_validation', 'upload'));
         $this->load->model('m_mahasiswa');
-        $this->load->library('form_validation');
     }
     function index()
     {
         $data['mahasiswa'] = $this->m_mahasiswa->tampilData()->result();
-        $this->load->view('mahasiswa', $data);
+        $config['base_url'] = site_url('mahasiswa/index/');
+        if ($this->uri->segment(3) == "delete_success")
+            $data['message'] = "<div class='alert alert-success'>Data berhasil dihapus</div>";
+        else if ($this->uri->segment(3) == "add_success")
+            $data['message'] = "<div class='alert alert-success'>Data Berhasil disimpan</div>";
+        else
+            $data['message'] = '';
+        $this->template->display('mahasiswa/index', $data);
     }
-    function hapus($nim)
+    function tambah()
     {
+        $nim = $this->input->post('nim');
+        if ($nim <> "") {
+            $cek = $this->m_mahasiswa->cek($nim);
+            if ($cek->num_rows() > 0) {
+                $data['message'] = "<div class='alert alert-warning'>NIM sudah digunakan</div>";
+                $this->template->display('mahasiswa/tambah', $data);
+            } else {
+                $isidata = array(
+                    'nim' => $this->input->post('nim'),
+                    'nama' => $this->input->post('nama'),
+                    'jurusan' => $this->input->post('jurusan'),
+                    'alamat' => $this->input->post('alamat')
+                );
+                $this->m_mahasiswa->simpan($isidata);
+                redirect('mahasiswa/index/add_success');
+            }
+        } else {
+            $data['message'] = "";
+            $this->template->display('mahasiswa/tambah', $data);
+        }
+    }
+    function hapus()
+    {
+        $nim = $this->input->post('kode');
         $this->m_mahasiswa->hapus($nim);
-        $data['mahasiswa'] = $this->m_mahasiswa->tampilData()->result();
-        $this->load->view('mahasiswa', $data);
     }
-    function insert()
-    {
-        $data['mahasiswa'] = $this->m_mahasiswa->tampilData()->result();
-        $this->load->view('insert_mahasiswa', $data);
-    }
-    function insertData()
+    function edit($id)
     {
         $nim = $this->input->post('nim');
         $nama = $this->input->post('nama');
         $jurusan = $this->input->post('jurusan');
         $alamat = $this->input->post('alamat');
-
-        $this->form_validation->set_rules(
-            'nim',
-            'NIM',
-            'required|numeric|min_length[8]|is_unique[mahasiswa.nim]',
-            [
-                'required' => '* NIM harus diisi !',
-                'numeric' => '* NIM harus angka !',
-                'min_length' => '* NIM harus diisi minimal 8 karakter !',
-                'is_unique' => '* NIM tidak boleh sama !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'nama',
-            'Nama',
-            'required|min_length[3]',
-            [
-                'required' => '* Nama harus diisi !',
-                'min_length' => '* Nama harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'jurusan',
-            'Jurusan',
-            'required',
-            [
-                'required' => '* Jurusan harus diisi !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'alamat',
-            'Alamat',
-            'required|min_length[3]',
-            [
-                'required' => '* Alamat harus diisi !',
-                'min_length' => '* Alamat harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $data = array(
-            'nim' => $nim,
-            'nama' => $nama,
-            'jurusan' => $jurusan,
-            'alamat' => $alamat
-        );
-
-        if ($this->form_validation->run() != true) {
-            $this->load->view('insert_mahasiswa');
+        if ($nim <> "" and $nama <> "" and $jurusan <> "" and $alamat <> "") {
+            $isidata = array(
+                'nama' => $this->input->post('nama'),
+                'jurusan' => $this->input->post('jurusan'),
+                'alamat' => $this->input->post('alamat')
+            );
+            $this->m_mahasiswa->update($nim, $isidata);
+            $data['message'] = "<div class='alert alert-success'>Data Berhasil diupdate</div>";
+            $data['mhs'] = $this->m_mahasiswa->cek($id)->row_array();
+            $this->template->display('mahasiswa/edit', $data);
         } else {
-            $this->m_mahasiswa->input_data($data, 'mahasiswa');
-            redirect('https://localhost/myci/index.php/mahasiswa');
+            $data['mhs'] = $this->m_mahasiswa->cek($id)->row_array();
+            $data['message'] = "";
+            $this->template->display('mahasiswa/edit', $data);
         }
-
     }
-    function edit($nim)
-    {
-        $where = array('nim' => $nim);
-        $data['mahasiswa'] = $this->m_mahasiswa->edit_data($where, 'mahasiswa')->result();
-        $this->load->view('edit_mahasiswa', $data);
-    }
-
-    function update()
-    {
-        $nim = $this->input->post('nim');
-        $nama = $this->input->post('nama');
-        $jurusan = $this->input->post('jurusan');
-        $alamat = $this->input->post('alamat');
-
-        $this->form_validation->set_rules(
-            'nama',
-            'Nama',
-            'required|min_length[3]',
-            [
-                'required' => '* Nama harus diisi !',
-                'min_length' => '* Nama harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'jurusan',
-            'Jurusan',
-            'required',
-            [
-                'required' => '* Jurusan harus diisi !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'alamat',
-            'Alamat',
-            'required|min_length[3]',
-            [
-                'required' => '* Alamat harus diisi !',
-                'min_length' => '* Alamat harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $data = array(
-            'nama' => $nama,
-            'jurusan' => $jurusan,
-            'alamat' => $alamat
-        );
-
-        $where = array(
-            'nim' => $nim
-        );
-
-        if ($this->form_validation->run() != true) {
-            $where = array('nim' => $nim);
-            $data['mahasiswa'] = $this->m_mahasiswa->edit_data($where, 'mahasiswa')->result();
-            $this->load->view('edit_mahasiswa', $data);
-        } else {
-            $this->m_mahasiswa->update_data($where, $data, 'mahasiswa');
-            redirect('https://localhost/myci/index.php/mahasiswa');
-        }
-
-    }
-
 }

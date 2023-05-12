@@ -1,0 +1,5 @@
+#Controller
+$this->load->library(array('template', 'pagination', 'form_validation'));
+
+#view
+action="<?php echo site_url('mahasiswa/simpan_mahasiswa'); ?>"

@@ -1,153 +1,77 @@
 <?php
 class buku extends CI_Controller
 {
+
+
     function __construct()
     {
         parent::__construct();
+        $this->load->library(array('template', 'pagination', 'form_validation', 'upload'));
         $this->load->model('m_buku');
-        $this->load->library('form_validation');
     }
+
     function index()
     {
         $data['buku'] = $this->m_buku->tampilData()->result();
-        $this->load->view('buku', $data);
+        $config['base_url'] = site_url('buku/index/');
+
+        if ($this->uri->segment(3) == "delete_success")
+            $data['message'] = "<div class='alert alert-success'>Data berhasil dihapus</div>";
+        else if ($this->uri->segment(3) == "add_success")
+            $data['message'] = "<div class='alert alert-success'>Data Berhasil disimpan</div>";
+        else
+            $data['message'] = '';
+        $this->template->display('buku/index', $data);
     }
-    function hapus($kd_buku)
+    function tambah()
     {
+        $kd_buku = $this->input->post('kd_buku');
+        if ($kd_buku <> "") {
+            $cek = $this->m_buku->cek($kd_buku);
+            if ($cek->num_rows() > 0) {
+                $data['message'] = "<div class='alert alert-warning'>Buku sudah digunakan</div>";
+                $this->template->display('buku/tambah', $data);
+            } else {
+                $isidata = array(
+                    'kd_buku' => $this->input->post('kd_buku'),
+                    'judul' => $this->input->post('judul'),
+                    'pengarang' => $this->input->post('pengarang'),
+                    'jenis' => $this->input->post('jenis')
+                );
+                $this->m_buku->simpan($isidata);
+                redirect('buku/index/add_success');
+            }
+        } else {
+            $data['message'] = "";
+            $this->template->display('buku/tambah', $data);
+        }
+    }
+    function hapus()
+    {
+        $kd_buku = $this->input->post('kode');
         $this->m_buku->hapus($kd_buku);
-        $data['buku'] = $this->m_buku->tampilData()->result();
-        $this->load->view('buku', $data);
     }
-    function insert()
-    {
-        $data['buku'] = $this->m_buku->tampilData()->result();
-        $this->load->view('insert_buku', $data);
-    }
-    function insertData()
+    function edit($id)
     {
         $kd_buku = $this->input->post('kd_buku');
         $judul = $this->input->post('judul');
         $pengarang = $this->input->post('pengarang');
         $jenis = $this->input->post('jenis');
-
-        $this->form_validation->set_rules(
-            'kd_buku',
-            'kd_buku',
-            'required|numeric|min_length[3]|is_unique[buku.kd_buku]',
-            [
-                'required' => '* Kode Buku harus diisi !',
-                'numeric' => '* Kode Buku harus angka !',
-                'min_length' => '* Kode Buku harus diisi minimal 3 karakter !',
-                'is_unique' => '* Kode Buku tidak boleh sama !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'judul',
-            'judul',
-            'required|min_length[3]',
-            [
-                'required' => '* Judul harus diisi !',
-                'min_length' => '* Judul harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'pengarang',
-            'pengarang',
-            'required',
-            [
-                'required' => '* Pengarang harus diisi !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'jenis',
-            'jenis',
-            'required|min_length[3]',
-            [
-                'required' => '* Jenis Buku harus diisi !',
-                'min_length' => '* Jenis Buku harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $data = array(
-            'kd_buku' => $kd_buku,
-            'judul' => $judul,
-            'pengarang' => $pengarang,
-            'jenis' => $jenis
-        );
-
-        if ($this->form_validation->run() != true) {
-            $this->load->view('insert_buku', $data);
+        if ($kd_buku <> "" and $judul <> "" and $pengarang <> "" and $jenis <> "") {
+            $isidata = array(
+                'judul' => $this->input->post('judul'),
+                'pengarang' => $this->input->post('pengarang'),
+                'jenis' => $this->input->post('jenis')
+            );
+            $this->m_buku->update($kd_buku, $isidata);
+            $data['message'] = "<div class='alert alert-success'>Data Berhasil diupdate</div>";
+            $data['bk'] = $this->m_buku->cek($id)->row_array();
+            $this->template->display('buku/edit', $data);
         } else {
-            $this->m_buku->input_data($data, 'buku');
-            redirect('https://localhost/myci/index.php/buku');
+            $data['bk'] = $this->m_buku->cek($id)->row_array();
+            $data['message'] = "";
+            $this->template->display('buku/edit', $data);
         }
-
-    }
-    function edit($kd_buku)
-    {
-        $where = array('kd_buku' => $kd_buku);
-        $data['buku'] = $this->m_buku->edit_data($where, 'buku')->result();
-        $this->load->view('edit_buku', $data);
-    }
-    
-    function update()
-    {
-        $kd_buku = $this->input->post('kd_buku');
-        $judul = $this->input->post('judul');
-        $pengarang = $this->input->post('pengarang');
-        $jenis = $this->input->post('jenis');
-
-        $this->form_validation->set_rules(
-            'judul',
-            'judul',
-            'required|min_length[3]',
-            [
-                'required' => '* Judul harus diisi !',
-                'min_length' => '* Judul harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'pengarang',
-            'pengarang',
-            'required',
-            [
-                'required' => '* pengarang harus diisi !'
-            ]
-        );
-
-        $this->form_validation->set_rules(
-            'jenis',
-            'jenis',
-            'required|min_length[3]',
-            [
-                'required' => '* jenis harus diisi !',
-                'min_length' => '* jenis harus diisi minimal 3 karakter !'
-            ]
-        );
-
-        $data = array(
-            'judul' => $judul,
-            'pengarang' => $pengarang,
-            'jenis' => $jenis
-        );
-
-        $where = array(
-            'kd_buku' => $kd_buku
-        );
-
-        if ($this->form_validation->run() != true) {
-            $where = array('kd_buku' => $kd_buku);
-            $data['buku'] = $this->m_buku->edit_data($where, 'buku')->result();
-            $this->load->view('edit_buku', $data);
-        } else {
-            $this->m_buku->update_data($where, $data, 'buku');
-            redirect('https://localhost/myci/index.php/buku');
-        }
-
     }
 
 }
