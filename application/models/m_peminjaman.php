@@ -2,17 +2,19 @@
 class m_peminjaman extends CI_Model
 {
     private $table = "peminjaman";
+    
 
     function nootomatis()
     {
+        $koneksi = mysqli_connect('localhost', 'root', '', 'ci');
         $today = date('Ymd');
-        $query = mysql_query("select max(id_peminjaman) as last from peminjaman where id_peminjaman like '$today%'");
-        $data = mysql_fetch_array($query);
+        $query = mysqli_query($koneksi,"select max(id_peminjaman) as last from peminjaman where id_peminjaman like '$today%'");
+        $data = mysqli_fetch_array($query);
         $lastNoFaktur = $data['last'];
 
         $lastNoUrut = substr($lastNoFaktur, 8, 3);
 
-        $nextNoUrut = $lastNoUrut + 1;
+        $nextNoUrut = (int) $lastNoUrut + 1;
 
         $nextNoTransaksi = $today . sprintf('%03s', $nextNoUrut);
 

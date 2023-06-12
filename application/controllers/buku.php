@@ -6,7 +6,7 @@ class buku extends CI_Controller
     function __construct()
     {
         parent::__construct();
-        $this->load->library(array('template', 'pagination', 'form_validation', 'upload'));
+        $this->load->library(['template', 'pagination', 'form_validation', 'upload']);
         $this->load->model('m_buku');
     }
 

@@ -10,13 +10,12 @@
     <link href="<?php echo base_url('assets/css/plugins/timeline/timeline.css'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/datepicker.css'); ?>" rel="stylesheet">
 
+
     <script src="<?php echo base_url('assets/js/jquery-1.8.3.min.js'); ?>"></script>
     <script src="<?php echo base_url('assets/js/bootstrap.js'); ?>"></script>
     <script src="<?php echo base_url('assets/js/tinymce/tinymce.min.js'); ?>"></script>
     <script>
-        tinymce.init({
-            selector: 'textarea'
-        });
+        tinymce.init({ selector: 'textarea' });
 
         $(function () {
             $("#tanggal1").datepicker({
@@ -47,21 +46,16 @@
         </div>
     </div>
 
-    <!-- Main Content Web -->
     <div class="container">
         <div class="row">
-            <!--
-                    <div class="col-md-3">
-                        <?php echo $_sidebar; ?>
-                    </div>
-                    -->
-
+            <div class="col-md-3">
+                <?php echo $_sidebar; ?>
+            </div>
             <div class="col-md-9">
                 <?php echo $_content; ?>
             </div>
         </div>
     </div>
-
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

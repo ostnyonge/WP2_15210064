@@ -33,7 +33,10 @@
 
             if (keycode == '13') {
                 var kode = $("#kode").val();
-
+                
+                console.log(
+                    kode
+                );
                 $.ajax({
                     url: "<?php echo site_url('peminjaman/cariBuku'); ?>",
                     type: "POST",

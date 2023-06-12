@@ -25,6 +25,6 @@
     <tr>
         <td colspan="2">Total Buku</td>
         <td colspan="2"><input type="text" id="jumlahTmp" readonly="readonly" value="<?php echo $jumlahTmp; ?>"
-                class="form-control"></td>
+                class="formcontrol"></td>
     </tr>
 </table>
